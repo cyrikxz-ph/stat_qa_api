@@ -1,0 +1,29 @@
+{
+  "name": "option",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "description": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "votes": {
+      "type": "hasMany",
+      "model": "vote",
+      "foreignKey": ""
+    },
+    "poll": {
+      "type": "belongsTo",
+      "model": "poll",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

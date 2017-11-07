@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../node_modules/loopback-ds-timestamp-mixin",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "mysqlDS"
+  },
+  "AccessToken": {
+    "dataSource": "mysqlDS",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "mysqlDS",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "mysqlDS",
+    "public": false,
+    "options": {
+      "strictObjectIDCoercion": true
+    }
+  },
+  "Role": {
+    "dataSource": "mysqlDS",
+    "public": false
+  },
+  "poll": {
+    "dataSource": "mysqlDS",
+    "public": true
+  },
+  "comment": {
+    "dataSource": "mysqlDS",
+    "public": false
+  },
+  "option": {
+    "dataSource": "mysqlDS",
+    "public": false
+  },
+  "vote": {
+    "dataSource": "mysqlDS",
+    "public": false
+  }
+}

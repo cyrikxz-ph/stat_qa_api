@@ -1,0 +1,16 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "mysqlDS": {
+    "host": "localhost",
+    "port": 3306,
+    "url": "mysql://starqa_admin:Pa$$w0rd@localhost/star_qa_dev",
+    "database": "star_qa_dev",
+    "password": "Pa$$w0rd",
+    "name": "mysqlDS",
+    "user": "starqa_admin",
+    "connector": "mysql"
+  }
+}

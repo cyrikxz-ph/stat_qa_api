@@ -1,0 +1,82 @@
+{
+  "name": "poll",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "mixins": {
+    "TimeStamp": {
+      "required": false,
+      "validateUpsert": true,
+      "silenceWarnings": false
+    }
+  },
+  "scope": {},
+  "properties": {
+    "question": {
+      "type": "string",
+      "required": true
+    },
+    "isOpen": {
+      "type": "boolean",
+      "required": true,
+      "default": true
+    },
+    "openTime": {
+      "type": "number",
+      "required": true,
+      "default": 86400
+    }
+  },
+  "validations": [],
+  "relations": {
+    "options": {
+      "type": "hasMany",
+      "model": "option",
+      "foreignKey": "",
+      "options": {
+        "validate": true,
+        "persistent": true,
+        "forceId": false
+      }
+    },
+    "comments": {
+      "type": "hasMany",
+      "model": "comment",
+      "foreignKey": ""
+    },
+    "votes": {
+      "type": "hasMany",
+      "model": "vote",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": {
+    "open": {
+      "accepts": [],
+      "returns": { "arg": "data", "type": "poll", "root": true},
+      "description": "Find all instance of poll that are still open",
+      "http": [
+        {
+          "path": "/open",
+          "verb": "get",
+          "status": 200
+        }
+      ]
+    },
+    "closed": {
+      "accepts": [],
+      "returns": { "arg": "data", "type": "poll", "root": true},
+      "description": "Find all instance of poll that are still open",
+      "http": [
+        {
+          "path": "/closed",
+          "verb": "get",
+          "status": 200
+        }
+      ]
+    }
+  }
+}
