@@ -8,6 +8,8 @@
   "scripts": {
     "lint": "eslint .",
     "start": "node .",
+    "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha tests/**/*.test.js",
+    "test-watch": "nodemon --exec \"npm test\"",
     "posttest": "npm run lint && nsp check"
   },
   "dependencies": {
@@ -28,7 +30,10 @@
   "devDependencies": {
     "eslint": "^3.17.1",
     "eslint-config-loopback": "^8.0.0",
-    "nsp": "^2.1.0"
+    "expect": "^21.2.1",
+    "mocha": "^4.0.1",
+    "nsp": "^2.1.0",
+    "supertest": "^3.0.0"
   },
   "repository": {
     "type": "",

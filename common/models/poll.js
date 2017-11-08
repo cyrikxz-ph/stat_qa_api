@@ -118,28 +118,50 @@ module.exports = function(Poll) {
     next();
   }
 
-  Poll.beforeRemote('create', function(ctx, instance, next) {
-    if (ctx.args.data._options) {
-      if (ctx.args.data._options.length > 0) {
-        next();
-      } else {
-        next({
-          statusCode: 404,
-          name: 'Bad Request',
-          message: 'The `poll` instance is not valid. Details: `_options` can\'t be empty array (value: []).',
-        });
-      }
-    } else {
-      next({
-        statusCode: 404,
-        name: 'Bad Request',
-        message: `The \`poll\` instance is not valid. Details: \`_options\` can't be blank (value: ${ctx.args.data._options}).`,
-      });
-    }
-  });
+  // Poll.beforeRemote('create', function(ctx, instance, next) {
+  //   if (ctx.args.data._options) {
+  //     if (ctx.args.data._options.length > 0) {
+  //       next();
+  //     } else {
+  //       next({
+  //         statusCode: 404,
+  //         name: 'Bad Request',
+  //         message: 'The `poll` instance is not valid. Details: `_options` can\'t be empty array (value: []).',
+  //       });
+  //     }
+  //   } else {
+  //     next({
+  //       statusCode: 404,
+  //       name: 'Bad Request',
+  //       message: `The \`poll\` instance is not valid. Details: \`_options\` can't be blank (value: ${ctx.args.data._options}).`,
+  //     });
+  //   }
+  // });
 
   Poll.beforeRemote('find', defaultFilterLimit);
   Poll.beforeRemote('prototype.__get__comments', defaultFilterLimit);
+
+  Poll.observe('before save', function(ctx, next) {
+    if (ctx.isNewInstance) {
+      if (!ctx.instance.question) {
+        next({
+          statusCode: 400,
+          name: 'Bad Request',
+          message: 'The `poll` instance is not valid. Details: `question` can\'t be empty or blank (value: ' + ctx.instance.question + ').',
+        });
+      } else if (!ctx.instance._options) {
+        next({
+          statusCode: 400,
+          name: 'Bad Request',
+          message: 'The `poll` instance is not valid. Details: `_options` can\'t be empty or blank (value: ' + ctx.instance._options + ').',
+        });
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
+  });
 
   // # Add Options to Poll - Relation
   Poll.observe('after save', function(ctx, next) {
@@ -150,7 +172,6 @@ module.exports = function(Poll) {
         if (option.description) {
           return poll.options.create({description: option.description})
           .then(function(newOption) {
-            console.log(newOption);
             return newOption;
           });
         } else {

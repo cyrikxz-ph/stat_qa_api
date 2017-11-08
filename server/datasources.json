@@ -4,9 +4,9 @@
     "connector": "memory"
   },
   "mysqlDS": {
-    "host": "localhost",
+    "host": "cpacket-mysqldb.cbwya4lpgcpb.ap-southeast-1.rds.amazonaws.com",
     "port": 3306,
-    "url": "mysql://starqa_admin:Pa$$w0rd@localhost/star_qa_dev",
+    "url": "mysql://starqa_admin:Pa$$w0rd@cpacket-mysqldb.cbwya4lpgcpb.ap-southeast-1.rds.amazonaws.com:3306/star_qa_dev",
     "database": "star_qa_dev",
     "password": "Pa$$w0rd",
     "name": "mysqlDS",
