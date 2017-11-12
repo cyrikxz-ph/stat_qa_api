@@ -4,12 +4,22 @@
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
 image: node:6.9.4
-
 pipelines:
   default:
     - step:
-        caches:
-          - node
-        script: # Modify the commands below to build your repository.
+        script:
           - npm install
-          - npm run test-bitbucket
+          - NODE_ENV=test && node server/scripts/auto-migrate-mysqldb.js
+          - npm test
+        services:
+          - mysql
+
+definitions:
+  services:
+    mysql:
+      image: mysql
+      environment:
+        MYSQL_DATABASE: 'star_qa_test'
+        MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+        MYSQL_USER: 'starqa_admin'
+        MYSQL_PASSWORD: 'password123'

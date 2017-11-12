@@ -1,8 +1,8 @@
 {
   "mysqlDS": {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "port": 3306,
-    "url": "mysql://starqa_admin:password123@localhost:3306/star_qa_dev",
+    "url": "mysql://starqa_admin:password123@127.0.0.1:3306/star_qa_dev",
     "database": "star_qa_dev",
     "password": "password123",
     "name": "mysqlDS",
