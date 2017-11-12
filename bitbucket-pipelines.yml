@@ -19,7 +19,7 @@ definitions:
     mysql:
       image: mysql
       environment:
-        MYSQL_DATABASE: 'star_qa_test'
         MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+        MYSQL_DATABASE: 'star_qa_test'
         MYSQL_USER: 'starqa_admin'
         MYSQL_PASSWORD: 'password123'
