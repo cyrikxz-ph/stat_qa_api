@@ -9,7 +9,7 @@ pipelines:
     - step:
         script:
           - npm install
-          - NODE_ENV=test && node server/scripts/auto-migrate-mysqldb.js
+          - NODE_ENV=test node server/scripts/auto-migrate-mysqldb.js
           - npm test
         services:
           - mysql
