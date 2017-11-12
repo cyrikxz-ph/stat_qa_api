@@ -91,11 +91,41 @@ module.exports = function(Poll) {
       });
   };
 
+  Poll.openCount = function(callback) {
+    // TODO
+    Poll.count({where: {isOpen: true}})
+      .then(function(count) {
+        callback(null, count);
+      })
+      .catch(function(err) {
+        var error = new Error;
+        error.statusCode = err.statusCode || 500;
+        error.name = err.name;
+        error.message = err.message;
+        callback(err);
+      });
+  };
+
   Poll.closed = function(callback) {
     // TODO
     Poll.find({where: {isOpen: false}})
       .then(function(polls) {
         callback(null, polls);
+      })
+      .catch(function(err) {
+        var error = new Error;
+        error.statusCode = err.statusCode || 500;
+        error.name = err.name;
+        error.message = err.message;
+        callback(err);
+      });
+  };
+
+  Poll.closedCount = function(callback) {
+    // TODO
+    Poll.count({where: {isOpen: false}})
+      .then(function(count) {
+        callback(null, count);
       })
       .catch(function(err) {
         var error = new Error;
@@ -118,30 +148,11 @@ module.exports = function(Poll) {
     next();
   }
 
-  // Poll.beforeRemote('create', function(ctx, instance, next) {
-  //   if (ctx.args.data._options) {
-  //     if (ctx.args.data._options.length > 0) {
-  //       next();
-  //     } else {
-  //       next({
-  //         statusCode: 404,
-  //         name: 'Bad Request',
-  //         message: 'The `poll` instance is not valid. Details: `_options` can\'t be empty array (value: []).',
-  //       });
-  //     }
-  //   } else {
-  //     next({
-  //       statusCode: 404,
-  //       name: 'Bad Request',
-  //       message: `The \`poll\` instance is not valid. Details: \`_options\` can't be blank (value: ${ctx.args.data._options}).`,
-  //     });
-  //   }
-  // });
-
   Poll.beforeRemote('find', defaultFilterLimit);
   Poll.beforeRemote('prototype.__get__comments', defaultFilterLimit);
 
   Poll.observe('before save', function(ctx, next) {
+    // Validate Poll input structure on create
     if (ctx.isNewInstance) {
       if (!ctx.instance.question) {
         next({
@@ -156,7 +167,16 @@ module.exports = function(Poll) {
           message: 'The `poll` instance is not valid. Details: `_options` can\'t be empty or blank (value: ' + ctx.instance._options + ').',
         });
       } else {
-        next();
+        var options = ctx.instance._options;
+        if (options.every(function(option) { return option.hasOwnProperty('description'); })) {
+          next();
+        } else {
+          next({
+            statusCode: 400,
+            name: 'Bad Request',
+            message: 'The `poll` instance is not valid. Details: `_options.description` can\'t be blank (value: ' + ctx.instance._options + ').',
+          });
+        }
       }
     } else {
       next();
@@ -168,23 +188,12 @@ module.exports = function(Poll) {
     var poll = ctx.instance;
     if (ctx.isNewInstance) {
       var optionsPromise = [];
+
       optionsPromise = poll._options.map(function(option, index) {
-        if (option.description) {
-          return poll.options.create({description: option.description})
+        return poll.options.create({description: option.description})
           .then(function(newOption) {
             return newOption;
           });
-        } else {
-          var error = new Error;
-          error.statusCode = 422;
-          error.name = 'ValidationError';
-          error.message = 'The `poll` instance is not valid. Details: _option[' + index + '].description can\'t be blank. (value: ' +
-                            option.description + ')';
-
-          return new Promise(function(resolve, reject) {
-            reject(error);
-          });
-        }
       });
 
       Promise.all(optionsPromise)

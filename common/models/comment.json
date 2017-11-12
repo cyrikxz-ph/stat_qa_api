@@ -15,8 +15,7 @@
   "properties": {
     "comment": {
       "type": "string",
-      "required": true,
-      "default": ""
+      "required": true
     }
   },
   "validations": [],

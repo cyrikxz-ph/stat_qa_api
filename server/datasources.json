@@ -1,13 +1,9 @@
 {
-  "db": {
-    "name": "db",
-    "connector": "memory"
-  },
   "mysqlDS": {
     "host": "cpacket-mysqldb.cbwya4lpgcpb.ap-southeast-1.rds.amazonaws.com",
     "port": 3306,
-    "url": "mysql://starqa_admin:Pa$$w0rd@cpacket-mysqldb.cbwya4lpgcpb.ap-southeast-1.rds.amazonaws.com:3306/star_qa_dev",
-    "database": "star_qa_dev",
+    "url": "mysql://starqa_admin:Pa$$w0rd@cpacket-mysqldb.cbwya4lpgcpb.ap-southeast-1.rds.amazonaws.com:3306/star_qa",
+    "database": "star_qa",
     "password": "Pa$$w0rd",
     "name": "mysqlDS",
     "user": "starqa_admin",
