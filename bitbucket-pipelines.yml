@@ -11,6 +11,12 @@ pipelines:
           - npm install
           - NODE_ENV=test node server/scripts/auto-migrate-mysqldb.js
           - npm test
+          - apt-get update && apt-get install -y python-dev
+          - curl -O https://bootstrap.pypa.io/get-pip.py
+          - python get-pip.py
+          - pip install awsebcli --upgrade
+          - eb init $AWS_APP_NAME -r $AWS_REGION_ID -p NODE
+          - eb deploy $AWS_ENV_NAME
         services:
           - mysql
 
