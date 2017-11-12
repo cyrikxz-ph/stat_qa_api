@@ -15,7 +15,7 @@ pipelines:
           - curl -O https://bootstrap.pypa.io/get-pip.py
           - python get-pip.py
           - pip install awsebcli --upgrade
-          - eb init $AWS_APP_NAME -r $AWS_REGION_ID -p nodejs
+          - eb init $AWS_APP_NAME -r $AWS_REGION_ID -p node.js
           - eb deploy $AWS_ENV_NAME
         services:
           - mysql
