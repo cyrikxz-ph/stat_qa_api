@@ -8,10 +8,9 @@
   "scripts": {
     "lint": "eslint .",
     "start": "node .",
-    "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha tests/**.test.js",
+    "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha tests/**.test.js --exit",
     "test-bitbucket": "export NODE_ENV=bitbucket || SET NODE_ENV=test && mocha tests/**.test.js -t 3000",
-    "test-watch": "nodemon --exec \"npm test\"",
-    "posttest": "npm run lint && nsp check"
+    "test-watch": "nodemon --exec \"npm test\""
   },
   "dependencies": {
     "cls-hooked": "^4.2.2",
