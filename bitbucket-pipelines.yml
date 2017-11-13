@@ -16,7 +16,7 @@ pipelines:
           - python get-pip.py
           - pip install awsebcli --upgrade
           - sh server/scripts/eb-init.sh
-          - eb deploy $AWS_ENV_NAME
+          - eb deploy $APPLICATION_ENV
         services:
           - mysql
 
