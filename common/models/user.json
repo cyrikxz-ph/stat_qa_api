@@ -1,0 +1,29 @@
+{
+  "name": "user",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {},
+  "validations": [],
+  "relations": {
+    "polls": {
+      "type": "hasMany",
+      "model": "poll",
+      "foreignKey": "userId"
+    },
+    "comments": {
+      "type": "hasMany",
+      "model": "comment",
+      "foreignKey": "userId"
+    },
+    "votes": {
+      "type": "hasMany",
+      "model": "vote",
+      "foreignKey": "userId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

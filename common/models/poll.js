@@ -169,6 +169,14 @@ module.exports = function(Poll) {
       } else {
         var options = ctx.instance._options;
         if (options.every(function(option) { return option.hasOwnProperty('description'); })) {
+
+          // Add userId to Poll
+          if (ctx.instance) {
+            ctx.instance.userId = ctx.options.accessToken.userId;
+          } else if (ctx.data) {
+            ctx.data.userId = ctx.options.accessToken.userId;
+          }
+
           next();
         } else {
           next({

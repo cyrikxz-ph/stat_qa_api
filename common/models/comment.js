@@ -10,4 +10,14 @@ module.exports = function(Comment) {
     }
     next();
   });
+
+  Comment.observe('before save', function(ctx, next) {
+    // Add userId to Comment
+    if (ctx.instance) {
+      ctx.instance.userId = ctx.options.accessToken.userId;
+    } else if (ctx.data) {
+      ctx.data.userId = ctx.options.accessToken.userId;
+    }
+    next();
+  });
 };

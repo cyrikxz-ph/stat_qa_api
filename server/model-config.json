@@ -14,12 +14,20 @@
       "./mixins"
     ]
   },
-  "User": {
-    "dataSource": "mysqlDS"
+  "user": {
+    "dataSource": "mysqlDS",
+    "public": true
   },
   "AccessToken": {
     "dataSource": "mysqlDS",
-    "public": false
+    "public": false,
+    "relations": {
+      "user": {
+        "type": "belongsTo",
+        "model": "user",
+        "foreignKey": "userId"
+      }
+    }
   },
   "ACL": {
     "dataSource": "mysqlDS",

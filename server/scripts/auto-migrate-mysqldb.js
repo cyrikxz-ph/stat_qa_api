@@ -7,7 +7,7 @@ var lbTables = [
   'comment',
   'vote',
   'option',
-  'User',
+  'user',
   'AccessToken',
   'ACL',
   'RoleMapping',
