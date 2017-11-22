@@ -52,11 +52,50 @@
       "foreignKey": ""
     }
   },
-  "acls": [],
+  "acls": [
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": [
+        "open",
+        "closed",
+        "openCount",
+        "closedCount",
+        "create",
+        "__create__comments"
+      ]
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": [
+        "__updateById__comments",
+        "__destroyById__comments"
+      ]
+    }
+  ],
   "methods": {
     "open": {
       "accepts": [],
-      "returns": { "arg": "data", "type": "poll", "root": true},
+      "returns": {
+        "arg": "data",
+        "type": "poll",
+        "root": true
+      },
       "description": "Find all instance of poll that are still open",
       "http": [
         {
@@ -68,7 +107,10 @@
     },
     "openCount": {
       "accepts": [],
-      "returns": { "arg": "count", "type": "number"},
+      "returns": {
+        "arg": "count",
+        "type": "number"
+      },
       "description": "Count all instance of poll that are still open",
       "http": [
         {
@@ -80,7 +122,11 @@
     },
     "closed": {
       "accepts": [],
-      "returns": { "arg": "data", "type": "poll", "root": true},
+      "returns": {
+        "arg": "data",
+        "type": "poll",
+        "root": true
+      },
       "description": "Find all instance of poll that are already closed",
       "http": [
         {
@@ -92,7 +138,10 @@
     },
     "closedCount": {
       "accepts": [],
-      "returns": { "arg": "count", "type": "number"},
+      "returns": {
+        "arg": "count",
+        "type": "number"
+      },
       "description": "Count all instance of poll that are already closed",
       "http": [
         {

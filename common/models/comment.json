@@ -12,6 +12,9 @@
       "silenceWarnings": false
     }
   },
+  "scope": {
+    "include": "user"
+  },
   "properties": {
     "comment": {
       "type": "string",
@@ -19,7 +22,6 @@
     }
   },
   "validations": [],
-  "acls": [],
   "relations": {
     "user": {
       "type": "belongsTo",
@@ -27,5 +29,13 @@
       "foreignKey": ""
     }
   },
+  "acls": [
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    }
+  ],
   "methods": {}
 }
