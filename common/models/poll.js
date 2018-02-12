@@ -49,14 +49,6 @@ module.exports = function(Poll) {
   Poll.disableRemoteMethodByName('prototype.__updateById__votes');
   Poll.disableRemoteMethodByName('prototype.__count__votes');
 
-  // Poll.disableRemoteMethodByName('prototype.__findById__accessTokens');
-  // Poll.disableRemoteMethodByName('prototype.__count__accessTokens');
-  // Poll.disableRemoteMethodByName('prototype.__create__accessTokens');
-  // Poll.disableRemoteMethodByName('prototype.__delete__accessTokens');
-  // Poll.disableRemoteMethodByName('prototype.__destroyById__accessTokens');
-  // Poll.disableRemoteMethodByName('prototype.__findById__accessTokens');
-  // Poll.disableRemoteMethodByName('prototype.__get__accessTokens');
-  // Poll.disableRemoteMethodByName('prototype.__updateById__accessTokens');
   Poll.disableRemoteMethodByName('prototype.updateAttributes');
   Poll.disableRemoteMethodByName('prototype.patchAttributes');
   // Poll.disableRemoteMethodByName('create');

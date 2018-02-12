@@ -8,6 +8,7 @@ var lbTables = [
   'vote',
   'option',
   'user',
+  'profile',
   'AccessToken',
   'ACL',
   'RoleMapping',

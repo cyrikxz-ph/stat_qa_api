@@ -59,5 +59,9 @@
   "vote": {
     "dataSource": "mysqlDS",
     "public": false
+  },
+  "profile": {
+    "dataSource": "mysqlDS",
+    "public": false
   }
 }

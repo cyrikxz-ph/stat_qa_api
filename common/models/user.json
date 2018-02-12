@@ -22,8 +22,21 @@
       "type": "hasMany",
       "model": "vote",
       "foreignKey": "userId"
+    },
+    "profile": {
+      "type": "hasOne",
+      "model": "profile",
+      "foreignKey": "userId"
     }
   },
-  "acls": [],
-  "methods": {}
+  "acls": [{
+    "principalType": "ROLE",
+    "principalId": "$owner",
+    "permission": "ALLOW",
+    "property": "__get__profile"
+  }],
+  "methods": {},
+  "scope": {
+    "include": ["profile"]
+  }
 }
