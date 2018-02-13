@@ -1,15 +1,15 @@
 'use strict';
 
-var RdsUrl = `mysqls://${process.env.RDS_USERNAME}:${process.env.RDS_PASSWORD}@${process.env.RDS_HOSTNAME}:${process.env.RDS_PORT}/${process.env.RDS_DBNAME}`;
+var RdsUrl = `mysqls://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOSTNAME}:${process.env.DB_PORT}/${process.env.DB_DBNAME}`;
 
 module.exports = {
   mysqlDS: {
     connector: 'mysql',
-    hostname: process.env.RDS_HOSTNAME,
+    hostname: process.env.DB_HOSTNAME,
     url: RdsUrl,
-    port: process.env.RDS_PORT,
-    user: process.env.RDS_USERNAME,
-    password: process.env.RDS_PASSWORD,
-    database: process.env.RDS_DBNAME,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DBNAME,
   },
 };
