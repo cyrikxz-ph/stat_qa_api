@@ -94,7 +94,6 @@ module.exports = function(User) {
         middleName: user.middleName,
       })
       .then(function(profile) {
-        console.log(profile);
         next();
       })
       .catch(function(e) {
