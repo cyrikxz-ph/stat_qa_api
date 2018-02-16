@@ -2,6 +2,8 @@
   "name": "user",
   "base": "User",
   "idInjection": true,
+  "restrictResetPasswordTokenScope": true,
+  "emailVerificationRequired": false,
   "options": {
     "validateUpsert": true
   },
