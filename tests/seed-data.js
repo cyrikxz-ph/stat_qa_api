@@ -4,7 +4,9 @@ var app = require('../server/server');
 var Poll = app.models.poll;
 var Comment = app.models.comment;
 var Vote = app.models.vote;
+var Option = app.models.option;
 var User = app.models.user;
+var Profile = app.models.profile;
 var Role = app.models.Role;
 var AccessToken = app.models.AccessToken;
 
@@ -12,10 +14,20 @@ var initUsers = [
   {
     email: 'user1@example.com',
     password: 'password',
+    firstName: 'Aleson Kelvin',
+    lastName: 'Llanes',
+    middleName: 'A',
+    speciality: 'Internal Medicine',
+    trainingLevel: 'Resident Doctor',
   },
   {
     email: 'user2@example.com',
     password: 'password',
+    firstName: 'Zaldy Bernabe',
+    lastName: 'Bughaw',
+    middleName: 'N',
+    speciality: 'Surgeon',
+    trainingLevel: 'Resident Doctor',
   },
 ];
 
@@ -72,6 +84,9 @@ var initComment = [
 var populatePolls = function(done) {
   Poll.destroyAll()
     .then(function() {
+      return Option.destroyAll();
+    })
+    .then(function() {
       return User.findOne({where: {email: initUsers[0].email}})
         .then(function(user) {
           return user;
@@ -95,6 +110,9 @@ var populatePolls = function(done) {
 
 var populateComment = function(done) {
   Poll.destroyAll()
+    .then(function() {
+      return Option.destroyAll();
+    })
     .then(function() {
       return Comment.destroyAll();
     })
@@ -132,6 +150,9 @@ var populateUser = function(done) {
       return Role.destroyAll();
     })
     .then(function() {
+      return Profile.destroyAll();
+    })
+    .then(function() {
       return User.create(initUsers)
               .then(function(users) {
                 return users;
@@ -148,6 +169,64 @@ var populateUser = function(done) {
     });
 };
 
+var populateVote = function(done) {
+  var loggedUser = {};
+  Poll.destroyAll()
+    .then(function() {
+      return Option.destroyAll();
+    })
+    .then(function() {
+      return Vote.destroyAll();
+    })
+    .then(function() {
+      return User.findOne({where: {email: initUsers[0].email}})
+        .then(function(user) {
+          loggedUser = user;
+          return user;
+        });
+    })
+    .then(function(user) {
+      // var newPoll = initPolls[0];
+      return Promise.all(initPolls.map(function(polls) {
+        return user.polls.create(polls)
+          .then(function(poll) {
+            return poll;
+          });
+      }))
+      .then(function(polls) {
+        return polls;
+      });
+    })
+    .then(function(polls) {
+      var pollToVote = polls.find(function(poll) {
+        return poll.question === initPolls[0].question;
+      });
+
+      return pollToVote.options.findOne({
+        where: {
+          description: initPolls[0]._options[0].description,
+        },
+      })
+      .then(function(option) {
+        return option;
+      });
+    })
+    .then(function(option) {
+      return Vote.create({
+        pollId: option.pollId,
+        userId: loggedUser.id,
+        optionId: option.id,
+      });
+    })
+    .then(function(vote) {
+      // console.log(vote);
+      done();
+    })
+    .catch(function(err) {
+      done(err);
+    });
+};
+
 module.exports = {
   initPolls,
   initComment,
@@ -155,4 +234,5 @@ module.exports = {
   populatePolls,
   populateComment,
   populateUser,
+  populateVote,
 };

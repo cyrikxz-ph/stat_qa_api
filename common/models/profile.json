@@ -7,15 +7,38 @@
   },
   "properties": {
     "firstName": {
-      "type": "string"
+      "type": "string",
+      "length": 50
     },
     "lastName": {
-      "type": "string"
+      "type": "string",
+      "length": 50
     },
     "middleName": {
-      "type": "string"
+      "type": "string",
+      "length": 50
+    },
+    "trainingLevel": {
+      "type": "string",
+      "length": 50
+    },
+    "speciality": {
+      "type": "string",
+      "length": 50
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false
     }
   },
+  "indexes": {
+    "userId_index": {
+      "keys": {
+        "userId": 1
+      }
+    }
+  },
+  "hidden": ["userId"],
   "validations": [],
   "relations": {},
   "acls": [

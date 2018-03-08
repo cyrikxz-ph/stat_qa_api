@@ -5,9 +5,22 @@
   "options": {
     "validateUpsert": true
   },
-  "UNIQUE_INDEX": {
-    "columns": "pollId,userId",
-    "kind": "unique"
+  "indexes":
+  {
+      "UNIQUE_INDEX":  {
+          "columns": "`pollId`,`userId`",
+          "kind": "unique"
+      },
+      "userId_index": {
+        "keys": {
+          "userId": 1
+        }
+      },
+      "pollId_index": {
+        "keys": {
+          "pollId": 1
+        }
+      }
   },
   "properties": {},
   "validations": [],

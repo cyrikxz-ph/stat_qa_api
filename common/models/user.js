@@ -83,7 +83,6 @@ module.exports = function(User) {
   User.disableRemoteMethodByName('prototype.__destroy__profile');
   // User.disableRemoteMethodByName('prototype.__update__profile');
 
-
   // # Add Options to Poll - Relation
   User.observe('after save', function(ctx, next) {
     var user = ctx.instance;
@@ -92,6 +91,8 @@ module.exports = function(User) {
         firstName: user.firstName,
         lastName: user.lastName,
         middleName: user.middleName,
+        trainingLevel: user.trainingLevel,
+        speciality: user.speciality,
       })
       .then(function(profile) {
         next();

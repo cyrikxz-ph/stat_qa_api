@@ -16,7 +16,8 @@
   "properties": {
     "question": {
       "type": "string",
-      "required": true
+      "required": true,
+      "length": 256
     },
     "isOpen": {
       "type": "boolean",
@@ -27,6 +28,18 @@
       "type": "number",
       "required": true,
       "default": 86400
+    }
+  },
+  "indexes": {
+    "userId_index": {
+      "keys": {
+        "userId": 1
+      }
+    },
+    "isOpen_index": {
+      "keys": {
+        "isOpen": 1
+      }
     }
   },
   "validations": [],
@@ -75,7 +88,8 @@
         "openCount",
         "closedCount",
         "create",
-        "__create__comments"
+        "__create__comments",
+        "__create__votes"
       ]
     },
     {

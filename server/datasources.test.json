@@ -2,7 +2,7 @@
   "mysqlDS": {
     "host": "127.0.0.1",
     "port": 3306,
-    "url": "mysql://starqa_admin:password123@127.0.0.1:3306/star_qa_test",
+    "url": "mysql://statqa_admin:password123@127.0.0.1:3306/stat_qa_test",
     "database": "star_qa_test",
     "password": "password123",
     "name": "mysqlDS",

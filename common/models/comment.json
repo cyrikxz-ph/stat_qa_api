@@ -21,6 +21,18 @@
       "required": true
     }
   },
+  "indexes": {
+    "userId_index": {
+      "keys": {
+        "userId": 1
+      }
+    },
+    "pollId_index": {
+      "keys": {
+        "pollId": 1
+      }
+    }
+  },
   "validations": [],
   "relations": {
     "user": {

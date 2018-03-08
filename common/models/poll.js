@@ -132,16 +132,26 @@ module.exports = function(Poll) {
   # Custom Functions #
   ####################
  */
-  function defaultFilterLimit(ctx, instance, next) {
-    if (!ctx.args.filter || !ctx.args.filter.limit) {
-      if (!ctx.args.filter) ctx.args.filter = {};
-      ctx.args.filter.limit = config.modelFilter.limit;
-    }
-    next();
-  }
+  Poll.checkPollsForClosure = function() {
+    console.log('Querying Open Polls...');
+    // callback(null, null);
+  };
+  // function defaultFilterLimit(ctx, instance, next) {
+  //   if (!ctx.args.filter || !ctx.args.filter.limit) {
+  //     if (!ctx.args.filter) ctx.args.filter = {};
+  //     ctx.args.filter.limit = config.modelFilter.limit;
+  //   }
+  //   next();
+  // }
 
-  Poll.beforeRemote('find', defaultFilterLimit);
-  Poll.beforeRemote('prototype.__get__comments', defaultFilterLimit);
+  // Poll.beforeRemote('find', defaultFilterLimit);
+  // Poll.beforeRemote('prototype.__get__comments', defaultFilterLimit);
+
+  // Poll.beforeRemote('prototype.__create__votes', function(ctx, instance, next) {
+  //   console.log('Casting vote');
+  //   console.log(instance);
+  //   next();
+  // });
 
   Poll.observe('before save', function(ctx, next) {
     // Validate Poll input structure on create
@@ -160,13 +170,18 @@ module.exports = function(Poll) {
         });
       } else {
         var options = ctx.instance._options;
-        if (options.every(function(option) { return option.hasOwnProperty('description'); })) {
-
+        if (options.every(function(option) {
+          return option.hasOwnProperty('description');
+        })) {
           // Add userId to Poll
           if (ctx.instance) {
-            ctx.instance.userId = ctx.options.accessToken.userId;
+            if (!ctx.instance.userId) {
+              ctx.instance.userId = ctx.options.accessToken.userId;
+            }
           } else if (ctx.data) {
-            ctx.data.userId = ctx.options.accessToken.userId;
+            if (!ctx.data.userId) {
+              ctx.data.userId = ctx.options.accessToken.userId;
+            }
           }
 
           next();
@@ -197,7 +212,8 @@ module.exports = function(Poll) {
       });
 
       Promise.all(optionsPromise)
-        .then(function() {
+        .then(function(options) {
+          poll._options = options;
           next();
         })
         .catch(function(err) {
@@ -267,7 +283,7 @@ module.exports = function(Poll) {
         );
 
         Promise.all(resultsPromise)
-          .then(function() {
+          .then(function(poll) {
             next();
           })
           .catch(function(err) {

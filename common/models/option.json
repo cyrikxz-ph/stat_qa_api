@@ -11,6 +11,13 @@
       "required": true
     }
   },
+  "indexes": {
+    "pollId_index": {
+      "keys": {
+        "pollId": 1
+      }
+    }
+  },
   "validations": [],
   "relations": {
     "votes": {
