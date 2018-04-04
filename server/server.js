@@ -1,10 +1,15 @@
 'use strict';
 
-require('dotenv').config();
 var loopback = require('loopback');
 var boot = require('loopback-boot');
+// var sslConfig = require('./ssl-config');
 
 var app = module.exports = loopback();
+
+// var options = {
+//   key: sslConfig.privateKey,
+//   cert: sslConfig.certificate
+// };
 
 app.start = function() {
   // start the web server
