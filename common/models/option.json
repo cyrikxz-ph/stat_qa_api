@@ -2,6 +2,13 @@
   "name": "option",
   "base": "PersistedModel",
   "idInjection": true,
+  "indexes": {
+    "pollId_index": {
+      "keys": {
+        "pollId": 1
+      }
+    }
+  },
   "options": {
     "validateUpsert": true
   },
@@ -9,13 +16,6 @@
     "description": {
       "type": "string",
       "required": true
-    }
-  },
-  "indexes": {
-    "pollId_index": {
-      "keys": {
-        "pollId": 1
-      }
     }
   },
   "validations": [],

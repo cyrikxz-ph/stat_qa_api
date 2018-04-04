@@ -2,13 +2,22 @@
   "name": "user",
   "base": "User",
   "idInjection": true,
-  "restrictResetPasswordTokenScope": true,
-  "emailVerificationRequired": false,
   "options": {
     "validateUpsert": true
   },
+  "restrictResetPasswordTokenScope": true,
+  "emailVerificationRequired": false,
+  "hidden": [
+    "emailVerified",
+    "realm",
+    "username"
+  ],
+  "scope": {
+    "include": [
+      "profile"
+    ]
+  },
   "properties": {},
-  "hidden": ["emailVerified", "realm", "username"],
   "validations": [],
   "relations": {
     "polls": {
@@ -32,14 +41,55 @@
       "foreignKey": "userId"
     }
   },
-  "acls": [{
-    "principalType": "ROLE",
-    "principalId": "$owner",
-    "permission": "ALLOW",
-    "property": "__get__profile"
-  }],
-  "methods": {},
-  "scope": {
-    "include": ["profile"]
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__get__profile"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "__update__profile"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "stats"
+    }
+  ],
+  "methods": {
+    "stats": {
+      "accepts": [
+        {
+          "arg": "id",
+          "type": "string",
+          "required": true,
+          "description": "user id",
+          "http": {
+            "source": "path"
+          }
+        }
+      ],
+      "returns": [
+        {
+          "arg": "stats",
+          "type": "object",
+          "root": true,
+          "description": "user stats"
+        }
+      ],
+      "description": "Gets user stats",
+      "http": [
+        {
+          "path": "/:id/stats",
+          "verb": "get"
+        }
+      ]
+    }
   }
 }

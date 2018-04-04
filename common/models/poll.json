@@ -2,6 +2,18 @@
   "name": "poll",
   "base": "PersistedModel",
   "idInjection": true,
+  "indexes": {
+    "isOpen_index": {
+      "keys": {
+        "isOpen": 1
+      }
+    },
+    "userId_index": {
+      "keys": {
+        "userId": 1
+      }
+    }
+  },
   "options": {
     "validateUpsert": true
   },
@@ -12,7 +24,11 @@
       "silenceWarnings": false
     }
   },
-  "scope": {},
+  "scope": {
+    "include": [
+      "user"
+    ]
+  },
   "properties": {
     "question": {
       "type": "string",
@@ -30,20 +46,18 @@
       "default": 86400
     }
   },
-  "indexes": {
-    "userId_index": {
-      "keys": {
-        "userId": 1
-      }
-    },
-    "isOpen_index": {
-      "keys": {
-        "isOpen": 1
-      }
-    }
-  },
   "validations": [],
   "relations": {
+    "user": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": ""
+    },
+    "specialization": {
+      "type": "belongsTo",
+      "model": "specialization",
+      "foreignKey": ""
+    },
     "options": {
       "type": "hasMany",
       "model": "option",
@@ -79,6 +93,7 @@
       "permission": "ALLOW"
     },
     {
+      "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "$authenticated",
       "permission": "ALLOW",
@@ -93,13 +108,22 @@
       ]
     },
     {
+      "accessType": "EXECUTE",
       "principalType": "ROLE",
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": [
+        "prototype.close",
         "__updateById__comments",
         "__destroyById__comments"
       ]
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "close"
     }
   ],
   "methods": {
@@ -162,6 +186,32 @@
           "path": "/closed/count",
           "verb": "get",
           "status": 200
+        }
+      ]
+    },
+    "close": {
+      "accepts": [
+        {
+          "arg": "id",
+          "type": "number",
+          "required": true,
+          "description": "poll id",
+          "http": {
+            "source": "path"
+          }
+        },
+        {
+          "arg": "options",
+          "type": "object",
+          "http": "optionsFromRequest"
+        }
+      ],
+      "returns": [],
+      "description": "close an open poll",
+      "http": [
+        {
+          "path": "/:id/close",
+          "verb": "post"
         }
       ]
     }

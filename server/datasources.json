@@ -8,5 +8,12 @@
     "name": "mysqlDS",
     "user": "starqa_admin",
     "connector": "mysql"
+  },
+  "sns": {
+    "name": "sns",
+    "connector": "loopback-connector-sns",
+    "accessKeyId": "AKIAJDAW43M2LRYCBVZQ",
+    "secretAccessKey": "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",
+    "region": "us-west-1"
   }
 }

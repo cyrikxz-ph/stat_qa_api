@@ -1,0 +1,29 @@
+{
+  "name": "notification",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "notificationType": {
+      "type": "string",
+      "required": true
+    },
+    "referenceId": {
+      "type": "number",
+      "required": true
+    },
+    "awsSnsTopicArn": {
+      "type": "string"
+    },
+    "success": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

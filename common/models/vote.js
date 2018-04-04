@@ -39,18 +39,17 @@ module.exports = function(Vote) {
                     ctx.data.userId = ctx.options.accessToken.userId;
                   }
                 }
-
+                var userId = ctx.instance.userId || ctx.data.userId;
                 poll.votes.count({
-                  where: {
-                    userId: ctx.instance.userId || ctx.data.userId,
-                  }})
+                  userId: userId,
+                })
                   .then(function(voteCount) {
                     if (voteCount) {
                       // Already votes
                       next({
                         statusCode: 400,
                         name: 'Bad Request',
-                        message: `already voted for pollId ${poll.id}.`,
+                        message: 'user ' + userId + 'already voted for pollId ' + poll.id + '.',
                       });
                     } else {
                       next();

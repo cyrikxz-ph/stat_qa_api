@@ -2,6 +2,18 @@
   "name": "comment",
   "base": "PersistedModel",
   "idInjection": true,
+  "indexes": {
+    "userId_index": {
+      "keys": {
+        "userId": 1
+      }
+    },
+    "pollId_index": {
+      "keys": {
+        "pollId": 1
+      }
+    }
+  },
   "options": {
     "validateUpsert": true
   },
@@ -19,18 +31,6 @@
     "comment": {
       "type": "string",
       "required": true
-    }
-  },
-  "indexes": {
-    "userId_index": {
-      "keys": {
-        "userId": 1
-      }
-    },
-    "pollId_index": {
-      "keys": {
-        "pollId": 1
-      }
     }
   },
   "validations": [],

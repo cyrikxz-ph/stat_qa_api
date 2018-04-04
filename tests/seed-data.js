@@ -1,5 +1,6 @@
 'use strict';
 
+var faker = require('faker');
 var app = require('../server/server');
 var Poll = app.models.poll;
 var Comment = app.models.comment;
@@ -27,6 +28,15 @@ var initUsers = [
     lastName: 'Bughaw',
     middleName: 'N',
     speciality: 'Surgeon',
+    trainingLevel: 'Resident Doctor',
+  },
+  {
+    email: 'user3@example.com',
+    password: 'password',
+    firstName: 'Rommel',
+    lastName: 'Rosales',
+    middleName: 'N',
+    speciality: 'MidWife',
     trainingLevel: 'Resident Doctor',
   },
 ];
@@ -74,23 +84,21 @@ var initPolls = [
 
 var initComment = [
   {
-    comment: 'This is a comment',
+    comment: faker.lorem.sentence(),
   },
   {
     comment: 'This is another comment',
   },
 ];
 
+var randomNumber = function(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+};
+
 var populatePolls = function(done) {
-  Poll.destroyAll()
-    .then(function() {
-      return Option.destroyAll();
-    })
-    .then(function() {
-      return User.findOne({where: {email: initUsers[0].email}})
-        .then(function(user) {
-          return user;
-        });
+  User.findOne({where: {email: initUsers[0].email}})
+    .then(function(user) {
+      return user;
     })
     .then(function(user) {
       Promise.all(initPolls.map(function(poll) {
@@ -109,19 +117,7 @@ var populatePolls = function(done) {
 };
 
 var populateComment = function(done) {
-  Poll.destroyAll()
-    .then(function() {
-      return Option.destroyAll();
-    })
-    .then(function() {
-      return Comment.destroyAll();
-    })
-    .then(function() {
-      return User.findOne({where: {email: initUsers[0].email}})
-        .then(function(user) {
-          return user;
-        });
-    })
+  User.findOne({where: {email: initUsers[0].email}})
     .then(function(user) {
       var newPoll = initPolls[0];
       return user.polls.create(initPolls[0])
@@ -153,15 +149,9 @@ var populateUser = function(done) {
       return Profile.destroyAll();
     })
     .then(function() {
-      return User.create(initUsers)
-              .then(function(users) {
-                return users;
-              });
+      return User.create(initUsers);
     })
     .then(function(users) {
-      // users.forEach(function(user, index) {
-      //   initUsers[index].id = user.id;
-      // });
       done();
     })
     .catch(function(err) {
@@ -171,31 +161,15 @@ var populateUser = function(done) {
 
 var populateVote = function(done) {
   var loggedUser = {};
-  Poll.destroyAll()
-    .then(function() {
-      return Option.destroyAll();
-    })
-    .then(function() {
-      return Vote.destroyAll();
-    })
-    .then(function() {
-      return User.findOne({where: {email: initUsers[0].email}})
-        .then(function(user) {
-          loggedUser = user;
-          return user;
-        });
-    })
+  User.findOne({where: {email: initUsers[0].email}})
     .then(function(user) {
-      // var newPoll = initPolls[0];
+      loggedUser = user;
       return Promise.all(initPolls.map(function(polls) {
         return user.polls.create(polls)
           .then(function(poll) {
             return poll;
           });
-      }))
-      .then(function(polls) {
-        return polls;
-      });
+      }));
     })
     .then(function(polls) {
       var pollToVote = polls.find(function(poll) {

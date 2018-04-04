@@ -1,5 +1,9 @@
 'use strict';
 
+var utils = require('loopback/lib/utils');
+var _ = require('lodash');
+var app = require('../../server/server');
+
 module.exports = function(User) {
 /*
   ###############
@@ -83,7 +87,92 @@ module.exports = function(User) {
   User.disableRemoteMethodByName('prototype.__destroy__profile');
   // User.disableRemoteMethodByName('prototype.__update__profile');
 
-  // # Add Options to Poll - Relation
+  /**
+   * Gets user stats
+   * @param {string} id user id
+   * @param {Function(Error, object)} callback
+   */
+
+  User.stats = function(id, cb) {
+    var Comment = app.models.Comment;
+    var Poll = app.models.Poll;
+    var Vote = app.models.Vote;
+    var stats;
+
+    var self = this;
+    var commentCountPromise = Comment.count({
+      userId: id,
+    });
+
+    var pollCountPromise = Poll.count({
+      userId: id,
+    });
+
+    var voteCountPromise = Vote.count({
+      userId: id,
+    });
+
+    var topVoteCountPromise = Vote.count({
+      and: [
+        {userId: id},
+        {isTopVote: true},
+      ],
+    });
+    // TODO
+    Promise.all([
+      commentCountPromise,
+      pollCountPromise,
+      voteCountPromise,
+      topVoteCountPromise])
+      .then(function(properties) {
+        stats = {
+          commentCount: properties[0],
+          pollCount: properties[1],
+          voteCount: properties[2],
+          topVoteCount: properties[3],
+        };
+        cb(null, stats);
+      })
+      .catch(function(err) {
+        cb(err);
+      });
+  };
+
+  User.observe('before save', function(ctx, next) {
+    var user = ctx.instance || ctx.data;
+
+    var Specialization = app.models.Specialization;
+    var TrainingLevel = app.models.TrainingLevel;
+
+    var specialyPromise = Specialization.count({id: user.specializationId});
+    var trainingLvlPromise = TrainingLevel.count({id: user.trainingLvlId});
+
+    Promise.all([specialyPromise, trainingLvlPromise])
+      .then(function(ret) {
+        var specialtyCount = ret[0];
+        var trainingLvlCount = ret[1];
+
+        if (specialtyCount < 1) {
+          next({
+            statusCode: 400,
+            name: 'Bad Request',
+            message: `specializationId ${user.specializationId} does not exists.`,
+          });
+        } else if (trainingLvlCount < 1) {
+          next({
+            statusCode: 400,
+            name: 'Bad Request',
+            message: `trainingLvlId ${user.trainingLvlId} does not exists.`,
+          });
+        } else {
+          next();
+        }
+      })
+      .catch(function(e) {
+        next(e);
+      });
+  });
+
   User.observe('after save', function(ctx, next) {
     var user = ctx.instance;
     if (ctx.isNewInstance) {
@@ -91,8 +180,8 @@ module.exports = function(User) {
         firstName: user.firstName,
         lastName: user.lastName,
         middleName: user.middleName,
-        trainingLevel: user.trainingLevel,
-        speciality: user.speciality,
+        trainingLvlId: user.trainingLvlId,
+        specializationId: user.specializationId,
       })
       .then(function(profile) {
         next();
@@ -102,7 +191,7 @@ module.exports = function(User) {
         next(e);
       });
     } else {
-      // TODO: poll update
+      console.log(ctx.data);
       next();
     }
   });

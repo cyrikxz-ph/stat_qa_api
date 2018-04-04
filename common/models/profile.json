@@ -2,9 +2,21 @@
   "name": "profile",
   "base": "PersistedModel",
   "idInjection": true,
+  "indexes": {
+    "userId_index": {
+      "keys": {
+        "userId": 1
+      }
+    }
+  },
   "options": {
     "validateUpsert": true
   },
+  "hidden": [
+    "userId",
+    "specializationId",
+    "trainingLvlId"
+  ],
   "properties": {
     "firstName": {
       "type": "string",
@@ -18,29 +30,30 @@
       "type": "string",
       "length": 50
     },
-    "trainingLevel": {
-      "type": "string",
-      "length": 50
-    },
-    "speciality": {
-      "type": "string",
-      "length": 50
-    },
     "verified": {
       "type": "boolean",
       "default": false
     }
   },
-  "indexes": {
-    "userId_index": {
-      "keys": {
-        "userId": 1
-      }
+  "validations": [],
+  "relations": {
+    "specialization": {
+      "type": "belongsTo",
+      "model": "specialization",
+      "foreignKey": ""
+    },
+    "trainingLvl": {
+      "type": "belongsTo",
+      "model": "trainingLevel",
+      "foreignKey": ""
     }
   },
-  "hidden": ["userId"],
-  "validations": [],
-  "relations": {},
+  "scope": {
+    "include": [
+      "specialization",
+      "trainingLvl"
+    ]
+  },
   "acls": [
     {
       "accessType": "*",

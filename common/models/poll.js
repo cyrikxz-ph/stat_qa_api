@@ -1,11 +1,18 @@
 'use strict';
 var _ = require('lodash');
+var loopback = require('loopback');
 
 module.exports = function(Poll) {
   var app = require('../../server/server');
-  var config = require('../../server/config.json');
-  var Comment = app.models.Comment;
-  var Option = app.models.Option;
+  // var config = require('../../server/config.json');
+
+  function getCurrentUserId() {
+    var ctx = loopback.getCurrentContext();
+    var accessToken = ctx && ctx.get('accessToken');
+    var userId = accessToken && accessToken.userId;
+    console.log(userId);
+    return userId;
+  }
 /*
   #########################################
   # Enable / Disable Default Model Routes #
@@ -173,18 +180,30 @@ module.exports = function(Poll) {
         if (options.every(function(option) {
           return option.hasOwnProperty('description');
         })) {
-          // Add userId to Poll
-          if (ctx.instance) {
-            if (!ctx.instance.userId) {
-              ctx.instance.userId = ctx.options.accessToken.userId;
-            }
-          } else if (ctx.data) {
-            if (!ctx.data.userId) {
-              ctx.data.userId = ctx.options.accessToken.userId;
-            }
+          // Add userId to Poll from request token
+          var poll = ctx.instance || ctx.data;
+
+          if (!poll.userId) {
+            poll.userId = ctx.options.accessToken.userId;
           }
 
-          next();
+          if (!poll.specializationId) {
+            poll.user.get()
+              .then(function(user) {
+                if (user && user.toJSON().profile.specialization.id) {
+                  poll.specializationId = user.toJSON().profile.specialization.id;
+                  next();
+                } else {
+                  next({
+                    statusCode: 500,
+                    name: 'Internal Server Error',
+                    message: `Unable to find userId ${poll.userId} of poll`,
+                  });
+                }
+              });
+          } else {
+            next();
+          }
         } else {
           next({
             statusCode: 400,
@@ -200,10 +219,17 @@ module.exports = function(Poll) {
 
   // # Add Options to Poll - Relation
   Poll.observe('after save', function(ctx, next) {
+    var Notification = app.models.Notification;
+
     var poll = ctx.instance;
     if (ctx.isNewInstance) {
+      // # Create Notification Reference
+      Notification.create({
+        notificationType: 'COMMENT_NOTIFICATION',
+        referenceId: poll.id,
+      });
+      // # Populate Options table
       var optionsPromise = [];
-
       optionsPromise = poll._options.map(function(option, index) {
         return poll.options.create({description: option.description})
           .then(function(newOption) {
@@ -229,46 +255,78 @@ module.exports = function(Poll) {
     }
   });
 
+  Poll.prototype.getOptions = function() {
+    return this.options.find()
+      .then(function(options) {
+        return Promise.all(options.map(function(option) {
+          return option.votes.count()
+            .then(function(voteCount) {
+              return {
+                voteCount: voteCount,
+                description: option.description,
+                id: option.id,
+              };
+            });
+        }))
+        .then(function(options) {
+          return options;
+        });
+      });
+  };
+
+    /**
+   * Close an open poll
+   * @param {number} id poll id
+   * @param {Function(Error)} callback
+   */
+  Poll.beforeRemote('prototype.close', function(ctx, unused, next) {
+    console.log('====> ', ctx.args.options.accessToken);
+    next();
+  });
+
+  Poll.prototype.close = function(id, options, cb) {
+    // TODO
+    console.log(options.accessToken);
+    cb(null, {
+      testing: 'testing',
+    });
+  };
+
   Poll.afterRemote('*', function(ctx, results, next) {
     var appendPollProperties = function(poll) {
       return new Promise(function(resolve, reject) {
-        poll.options.find()
-        .then(function(options) {
-          var optionsPromise = options.map(
-            function(option) {
-              return option.votes.count()
-                .then(function(count) {
-                  option.voteCount = count;
-                  return _.omit(option.toJSON(), 'pollId');
-                });
-            });
+        var commentCount = poll.comments.count();
+        var voteCount = poll.votes.count();
+        var options = poll.getOptions();
+        var userVote = poll.votes.findOne({
+          where: {
+            userId: poll.userId,
+          }})
+          .then(function(vote) {
+            if (vote) {
+              return _.omit(vote.toJSON(), ['id', 'pollId', 'userId']);
+            } else {
+              return {};
+            }
+          });
 
-          return Promise.all(optionsPromise)
-            .then(function(options) {
-              poll._options = options;
-              return poll;
-            });
-        })
-        .then(function(poll) {
-          return poll.comments.count()
-            .then(function(count) {
-              poll.totalComments = count || 0;
-              return Promise.resolve(poll);
-            });
-        })
-        .then(function(poll) {
-          return poll.votes.count()
-            .then(function(count) {
-              poll.totalVotes = count;
-              return poll;
-            });
-        })
-        .then(function(poll) {
-          resolve(poll);
-        })
-        .catch(function(err) {
-          reject(err);
-        });
+        Promise.all([
+          commentCount,
+          voteCount,
+          userVote,
+          options,
+        ])
+          .then(function(properties) {
+            poll.totalComments = properties[0];
+            poll.totalVotes = properties[1];
+            poll.userVote = properties[2];
+            poll._options = properties[3];
+            resolve(poll);
+          })
+          .catch(function(err) {
+            console.log(err);
+            reject(err);
+          });
       });
     };
 

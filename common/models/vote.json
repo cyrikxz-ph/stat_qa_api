@@ -2,27 +2,34 @@
   "name": "vote",
   "base": "PersistedModel",
   "idInjection": true,
+  "indexes": {
+    "UNIQUE_INDEX": {
+      "columns": "`pollId`,`userId`",
+      "kind": "unique"
+    },
+    "userId_index": {
+      "keys": {
+        "userId": 1
+      }
+    },
+    "pollId_index": {
+      "keys": {
+        "pollId": 1
+      }
+    }
+  },
   "options": {
     "validateUpsert": true
   },
-  "indexes":
-  {
-      "UNIQUE_INDEX":  {
-          "columns": "`pollId`,`userId`",
-          "kind": "unique"
-      },
-      "userId_index": {
-        "keys": {
-          "userId": 1
-        }
-      },
-      "pollId_index": {
-        "keys": {
-          "pollId": 1
-        }
-      }
+  "hidden": [
+    "isTopVote"
+  ],
+  "properties": {
+    "isTopVote": {
+      "type": "boolean",
+      "default": false
+    }
   },
-  "properties": {},
   "validations": [],
   "relations": {
     "option": {
