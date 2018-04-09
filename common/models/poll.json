@@ -137,7 +137,7 @@
       "http": [
         {
           "path": "/expire",
-          "verb": "post",
+          "verb": "get",
           "status": 200
         }
       ]
