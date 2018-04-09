@@ -121,97 +121,24 @@
     {
       "accessType": "EXECUTE",
       "principalType": "ROLE",
-      "principalId": "$owner",
+      "principalId": "$everyone",
       "permission": "ALLOW",
-      "property": "close"
+      "property": "expireOpenPolls"
     }
   ],
   "methods": {
-    "open": {
+    "expireOpenPolls": {
       "accepts": [],
       "returns": {
-        "arg": "data",
-        "type": "poll",
-        "root": true
+        "arg": "pollIds",
+        "type": "[number]"
       },
-      "description": "Find all instance of poll that are still open",
+      "description": "Expire open polls that are beyond open time",
       "http": [
         {
-          "path": "/open",
-          "verb": "get",
+          "path": "/expire",
+          "verb": "post",
           "status": 200
-        }
-      ]
-    },
-    "openCount": {
-      "accepts": [],
-      "returns": {
-        "arg": "count",
-        "type": "number"
-      },
-      "description": "Count all instance of poll that are still open",
-      "http": [
-        {
-          "path": "/open/count",
-          "verb": "get",
-          "status": 200
-        }
-      ]
-    },
-    "closed": {
-      "accepts": [],
-      "returns": {
-        "arg": "data",
-        "type": "poll",
-        "root": true
-      },
-      "description": "Find all instance of poll that are already closed",
-      "http": [
-        {
-          "path": "/closed",
-          "verb": "get",
-          "status": 200
-        }
-      ]
-    },
-    "closedCount": {
-      "accepts": [],
-      "returns": {
-        "arg": "count",
-        "type": "number"
-      },
-      "description": "Count all instance of poll that are already closed",
-      "http": [
-        {
-          "path": "/closed/count",
-          "verb": "get",
-          "status": 200
-        }
-      ]
-    },
-    "close": {
-      "accepts": [
-        {
-          "arg": "id",
-          "type": "number",
-          "required": true,
-          "description": "poll id",
-          "http": {
-            "source": "path"
-          }
-        },
-        {
-          "arg": "options",
-          "type": "object",
-          "http": "optionsFromRequest"
-        }
-      ],
-      "returns": [],
-      "description": "close an open poll",
-      "http": [
-        {
-          "path": "/:id/close",
-          "verb": "post"
         }
       ]
     }

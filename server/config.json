@@ -19,7 +19,5 @@
     },
     "cors": false
   },
-  "modelFilter": {
-    "limit": 10
-  }
+  "awsSnsNotificationEnabled": true
 }

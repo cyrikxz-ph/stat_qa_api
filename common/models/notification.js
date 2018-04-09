@@ -4,6 +4,7 @@ var uuidv1 = require('uuid/v1');
 
 module.exports = function(Notification) {
   var app = require('../../server/server');
+  var config = require('../../server/config.json');
   var env = process.env.NODE_ENV || 'development';
 
   Notification.observe('before save', function(ctx, next) {
@@ -19,7 +20,7 @@ module.exports = function(Notification) {
       snsTopicName = `${env}-poll-notification-${uuidv1()}`;
     }
 
-    if (env !== 'test') {
+    if (config.awsSnsNotificationEnabled) {
       Sns.createTopic({
         Name: snsTopicName,
       }, function(err, data) {

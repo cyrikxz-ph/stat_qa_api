@@ -21,7 +21,5 @@ module.exports = {
     },
     cors: false,
   },
-  modelFilter: {
-    limit: 10,
-  },
+  awsSnsNotificationEnabled: false,
 };

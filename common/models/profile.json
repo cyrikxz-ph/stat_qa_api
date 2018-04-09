@@ -17,6 +17,12 @@
     "specializationId",
     "trainingLvlId"
   ],
+  "scope": {
+    "include": [
+      "specialization",
+      "trainingLvl"
+    ]
+  },
   "properties": {
     "firstName": {
       "type": "string",
@@ -47,12 +53,6 @@
       "model": "trainingLevel",
       "foreignKey": ""
     }
-  },
-  "scope": {
-    "include": [
-      "specialization",
-      "trainingLvl"
-    ]
   },
   "acls": [
     {

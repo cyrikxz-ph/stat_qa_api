@@ -1,6 +1,8 @@
 'use strict';
 var _ = require('lodash');
 var loopback = require('loopback');
+var utils = require('loopback/lib/utils');
+var moment = require('moment');
 
 module.exports = function(Poll) {
   var app = require('../../server/server');
@@ -74,91 +76,119 @@ module.exports = function(Poll) {
   Poll.disableRemoteMethodByName('replaceOrCreate');
   Poll.disableRemoteMethodByName('upsertWithWhere');
 
-  // Poll.validatesPresenceOf('_options');
-  Poll.open = function(callback) {
-    // TODO
-    Poll.find({where: {isOpen: true}})
-      .then(function(polls) {
-        callback(null, polls);
-      })
-      .catch(function(err) {
-        var error = new Error;
-        error.statusCode = err.statusCode || 500;
-        error.name = err.name;
-        error.message = err.message;
-        callback(err);
-      });
-  };
+  // // Poll.validatesPresenceOf('_options');
+  // Poll.open = function(filter, callback) {
+  //   // TODO
+  //   console.log(filter);
+  //   Poll.find({where: {isOpen: true}})
+  //     .then(function(polls) {
+  //       callback(null, polls);
+  //     })
+  //     .catch(function(err) {
+  //       var error = new Error;
+  //       error.statusCode = err.statusCode || 500;
+  //       error.name = err.name;
+  //       error.message = err.message;
+  //       callback(err);
+  //     });
+  // };
 
-  Poll.openCount = function(callback) {
-    // TODO
-    Poll.count({where: {isOpen: true}})
-      .then(function(count) {
-        callback(null, count);
-      })
-      .catch(function(err) {
-        var error = new Error;
-        error.statusCode = err.statusCode || 500;
-        error.name = err.name;
-        error.message = err.message;
-        callback(err);
-      });
-  };
+  // Poll.openCount = function(where, callback) {
+  //   var whereObj = where ? _.pick(JSON.parse(where), ['']) : {};
+  //   whereObj['isOpen'] = true;
 
-  Poll.closed = function(callback) {
-    // TODO
-    Poll.find({where: {isOpen: false}})
-      .then(function(polls) {
-        callback(null, polls);
-      })
-      .catch(function(err) {
-        var error = new Error;
-        error.statusCode = err.statusCode || 500;
-        error.name = err.name;
-        error.message = err.message;
-        callback(err);
-      });
-  };
+  //   console.log(whereObj);
+  //   Poll.count(whereObj)
+  //     .then(function(count) {
+  //       callback(null, count);
+  //     })
+  //     .catch(function(err) {
+  //       var error = new Error;
+  //       error.statusCode = err.statusCode || 500;
+  //       error.name = err.name;
+  //       error.message = err.message;
+  //       callback(err);
+  //     });
+  // };
 
-  Poll.closedCount = function(callback) {
-    // TODO
-    Poll.count({where: {isOpen: false}})
-      .then(function(count) {
-        callback(null, count);
-      })
-      .catch(function(err) {
-        var error = new Error;
-        error.statusCode = err.statusCode || 500;
-        error.name = err.name;
-        error.message = err.message;
-        callback(err);
-      });
-  };
+  // Poll.closed = function(callback) {
+  //   // TODO
+  //   Poll.find({where: {isOpen: false}})
+  //     .then(function(polls) {
+  //       callback(null, polls);
+  //     })
+  //     .catch(function(err) {
+  //       var error = new Error;
+  //       error.statusCode = err.statusCode || 500;
+  //       error.name = err.name;
+  //       error.message = err.message;
+  //       callback(err);
+  //     });
+  // };
+
+  // Poll.closedCount = function(callback) {
+  //   // TODO
+  //   Poll.count({where: {isOpen: false}})
+  //     .then(function(count) {
+  //       callback(null, count);
+  //     })
+  //     .catch(function(err) {
+  //       var error = new Error;
+  //       error.statusCode = err.statusCode || 500;
+  //       error.name = err.name;
+  //       error.message = err.message;
+  //       callback(err);
+  //     });
+  // };
 /*
   ####################
   # Custom Functions #
   ####################
  */
-  Poll.checkPollsForClosure = function() {
+  Poll.expireOpenPolls = function(cb) {
     console.log('Querying Open Polls...');
-    // callback(null, null);
+    var Polls = app.models.Poll;
+
+    Poll.find({ where: {isOpen: true}})
+      .then(function(polls) {
+        var expiredPolls = _.filter(polls, function(poll) {
+          return moment(poll.createdAt).add(poll.openTime, 'seconds').diff(moment(), 'hours') < 0;
+        });
+        // console.log(expiredPolls);
+        var exPollPromise = expiredPolls.map(function(poll) {
+          return poll.close()
+            .then(function(poll) {
+              console.log(poll.id);
+              return poll.id;
+            });
+        });
+
+        Promise.all(exPollPromise)
+          .then(function(polls) {
+            console.log(polls);
+            cb(null, polls);
+          })
+          .catch(function(e) {
+            cb(e);
+          });
+      })
+      .catch(function(e) {
+        cb(e);
+      });
   };
-  // function defaultFilterLimit(ctx, instance, next) {
-  //   if (!ctx.args.filter || !ctx.args.filter.limit) {
-  //     if (!ctx.args.filter) ctx.args.filter = {};
-  //     ctx.args.filter.limit = config.modelFilter.limit;
-  //   }
-  //   next();
-  // }
 
-  // Poll.beforeRemote('find', defaultFilterLimit);
-  // Poll.beforeRemote('prototype.__get__comments', defaultFilterLimit);
+  Poll.prototype.close = function(cb) {
+    cb = cb || utils.createPromiseCallback();
+    this.updateAttribute('isOpen', false)
+      .then(function(poll) {
+        cb(null, poll);
+      })
+      .catch(function(e) {
+        cb(e);
+      });
 
-  // Poll.beforeRemote('prototype.__create__votes', function(ctx, instance, next) {
-  //   console.log('Casting vote');
-  //   console.log(instance);
-  //   next();
-  // });
+    return cb.promise;
+  };
 
   Poll.observe('before save', function(ctx, next) {
     // Validate Poll input structure on create
@@ -272,24 +302,6 @@ module.exports = function(Poll) {
           return options;
         });
       });
-  };
-
-    /**
-   * Close an open poll
-   * @param {number} id poll id
-   * @param {Function(Error)} callback
-   */
-  Poll.beforeRemote('prototype.close', function(ctx, unused, next) {
-    console.log('====> ', ctx.args.options.accessToken);
-    next();
-  });
-
-  Poll.prototype.close = function(id, options, cb) {
-    // TODO
-    console.log(options.accessToken);
-    cb(null, {
-      testing: 'testing',
-    });
   };
 
   Poll.afterRemote('*', function(ctx, results, next) {
