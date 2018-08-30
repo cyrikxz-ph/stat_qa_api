@@ -41,6 +41,11 @@
       "type": "belongsTo",
       "model": "poll",
       "foreignKey": ""
+    },
+    "user": {
+      "type": "belongsTo",
+      "model": "user",
+      "foreignKey": ""
     }
   },
   "acls": [

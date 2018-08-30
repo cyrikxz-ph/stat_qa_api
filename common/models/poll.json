@@ -104,7 +104,8 @@
         "closedCount",
         "create",
         "__create__comments",
-        "__create__votes"
+        "__create__votes",
+        "voteDetails"
       ]
     },
     {
@@ -137,6 +138,22 @@
       "http": [
         {
           "path": "/expire",
+          "verb": "get",
+          "status": 200
+        }
+      ]
+    },
+    "prototype.voteDetails": {
+      "accepts": [],
+      "returns": {
+        "arg": "data",
+        "type": "Vote",
+        "root": true
+      },
+      "description": "Expire open polls that are beyond open time",
+      "http": [
+        {
+          "path": "/votes/details",
           "verb": "get",
           "status": 200
         }

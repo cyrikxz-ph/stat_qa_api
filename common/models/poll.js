@@ -12,7 +12,7 @@ module.exports = function(Poll) {
     var ctx = loopback.getCurrentContext();
     var accessToken = ctx && ctx.get('accessToken');
     var userId = accessToken && accessToken.userId;
-    console.log(userId);
+    // console.log(userId);
     return userId;
   }
 /*
@@ -149,7 +149,7 @@ module.exports = function(Poll) {
     console.log('Querying Open Polls...');
     var Polls = app.models.Poll;
 
-    Poll.find({ where: {isOpen: true}})
+    Poll.find({where: {isOpen: true}})
       .then(function(polls) {
         var expiredPolls = _.filter(polls, function(poll) {
           return moment(poll.createdAt).add(poll.openTime, 'seconds').diff(moment(), 'hours') < 0;
@@ -175,6 +175,123 @@ module.exports = function(Poll) {
       .catch(function(e) {
         cb(e);
       });
+  };
+  Poll.prototype.voteDetails = function(cb) {
+    var pollVotes = this.votes.find(
+      {
+        include: [{
+          relation: 'user',
+          scope: {
+            include: {
+              relation: 'profile',
+            },
+          },
+        },
+        {
+          relation: 'option',
+          scope: {
+            fields: ['description', 'id'],
+          },
+        }],
+      });
+
+    Promise.all([
+      pollVotes,
+    ])
+    .then(function(props) {
+      var votesData = _.map(props[0], function(vote) {
+        return {
+          optionId: vote.toJSON().option.id,
+          optionDesc: vote.toJSON().option.description,
+          userId: vote.toJSON().user.id,
+          specialtyId: vote.toJSON().user.profile.specialization.id,
+          specialtyName: vote.toJSON().user.profile.specialization.name,
+          trainingLvlId: vote.toJSON().user.profile.trainingLvl.id,
+          trainingLvlDesc: vote.toJSON().user.profile.trainingLvl.description,
+        };
+      });
+
+      var voteBySpecialty = _.chain(votesData)
+        .map(function(item) {
+          return {
+            specialtyId: item.specialtyId,
+            specialtyName: item.specialtyName,
+          };
+        })
+        .uniqBy('specialtyId')
+        .map(function(specialty) {
+          console.log(specialty.specialtyName);
+          specialty['optionVotes'] = _.chain(votesData)
+            .filter(function(data) {
+              return specialty.specialtyId == data.specialtyId;
+            })
+            .reduce(function(result, current) {
+              var optionIdx = _.findIndex(result, function(resultOption) {
+                return resultOption.optionId == current.optionId;
+              });
+              if (optionIdx <= 0) {
+                result.push({
+                  optionId: current.optionId,
+                  optionDesc: current.optionDesc,
+                  voteCount: 1,
+                });
+              } else {
+                current[optionIdx].voteCount++;
+              }
+              return result;
+            }, [])
+            .value();
+
+          return specialty;
+        })
+        .value();
+
+      var voteByTrainingLvl = _.chain(votesData)
+        .map(function(item) {
+          return {
+            trainingLvlId: item.trainingLvlId,
+            trainingLvlDesc: item.trainingLvlDesc,
+          };
+        })
+        .uniqBy('trainingLvlId')
+        .map(function(trainingLvl) {
+          trainingLvl['optionVotes'] = _.chain(votesData)
+            .filter(function(data) {
+              return trainingLvl.trainingLvlId == data.trainingLvlId;
+            })
+            .reduce(function(result, current) {
+              var optionIdx = _.findIndex(result, function(resultOption) {
+                return resultOption.optionId == current.optionId;
+              });
+              if (optionIdx < 0) {
+                result.push({
+                  optionId: current.optionId,
+                  optionDesc: current.optionDesc,
+                  voteCount: 1,
+                });
+              } else {
+                result[optionIdx].voteCount++;
+              }
+              return result;
+            }, [])
+            .value();
+          return trainingLvl;
+        })
+        .value();
+
+      var ret = {
+        optionVotesBySpecialty: voteBySpecialty,
+        optionVotesByTrainingLvl: voteByTrainingLvl,
+      };
+      return cb(null, ret);
+    })
+    .catch(function(err) {
+      var error = new Error;
+      error.statusCode = err.statusCode || 500;
+      error.name = err.name;
+      error.message = err.message;
+      return cb(error);
+    });
   };
 
   Poll.prototype.close = function(cb) {
@@ -336,7 +453,6 @@ module.exports = function(Poll) {
             resolve(poll);
           })
           .catch(function(err) {
-            console.log(err);
             reject(err);
           });
       });
