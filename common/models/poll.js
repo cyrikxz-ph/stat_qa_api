@@ -424,7 +424,7 @@ module.exports = function(Poll) {
   Poll.afterRemote('*', function(ctx, results, next) {
     var appendPollProperties = function(poll) {
       return new Promise(function(resolve, reject) {
-        var loggedUserId = ctx.options.accessToken.userId;
+        var loggedUserId = ctx.args.options.accessToken.userId;
         var commentCount = poll.comments.count();
         var voteCount = poll.votes.count();
         var options = poll.getOptions();
