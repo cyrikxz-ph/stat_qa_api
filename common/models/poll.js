@@ -177,6 +177,7 @@ module.exports = function(Poll) {
       });
   };
   Poll.prototype.voteDetails = function(cb) {
+    var pollOptions = this.options.find();
     var pollVotes = this.votes.find(
       {
         include: [{
@@ -197,8 +198,16 @@ module.exports = function(Poll) {
 
     Promise.all([
       pollVotes,
+      pollOptions,
     ])
     .then(function(props) {
+      var options = _.map(props[1], function(option) {
+        return {
+          optionId: option.id,
+          optionDesc: option.description,
+          voteCount: 0,
+        };
+      });
       var votesData = _.map(props[0], function(vote) {
         return {
           optionId: vote.toJSON().option.id,
@@ -220,7 +229,6 @@ module.exports = function(Poll) {
         })
         .uniqBy('specialtyId')
         .map(function(specialty) {
-          console.log(specialty.specialtyName);
           specialty['optionVotes'] = _.chain(votesData)
             .filter(function(data) {
               return specialty.specialtyId == data.specialtyId;
@@ -229,17 +237,18 @@ module.exports = function(Poll) {
               var optionIdx = _.findIndex(result, function(resultOption) {
                 return resultOption.optionId == current.optionId;
               });
-              if (optionIdx <= 0) {
+              if (optionIdx < 0) {
                 result.push({
                   optionId: current.optionId,
                   optionDesc: current.optionDesc,
                   voteCount: 1,
                 });
               } else {
-                current[optionIdx].voteCount++;
+                result[optionIdx].voteCount++;
               }
               return result;
             }, [])
+            .unionBy(options, 'optionId')
             .value();
 
           return specialty;
@@ -274,6 +283,7 @@ module.exports = function(Poll) {
               }
               return result;
             }, [])
+            .unionBy(options, 'optionId')
             .value();
           return trainingLvl;
         })

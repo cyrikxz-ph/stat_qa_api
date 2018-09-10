@@ -147,10 +147,10 @@
       "accepts": [],
       "returns": {
         "arg": "data",
-        "type": "Vote",
+        "type": "Object",
         "root": true
       },
-      "description": "Expire open polls that are beyond open time",
+      "description": "Fetch polls vote details",
       "http": [
         {
           "path": "/votes/details",
