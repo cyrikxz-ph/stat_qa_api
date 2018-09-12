@@ -87,34 +87,47 @@ module.exports = function(User) {
   User.disableRemoteMethodByName('prototype.__destroy__profile');
   // User.disableRemoteMethodByName('prototype.__update__profile');
 
+  /*
+    ###############
+    User - devices (hasMany)
+    ##############
+  */
+  User.disableRemoteMethodByName('prototype.__count__devices');
+  User.disableRemoteMethodByName('prototype.__delete__devices');
+  // User.disableRemoteMethodByName('prototype.__create__devices');
+  // User.disableRemoteMethodByName('prototype.__findById__devices');
+  User.disableRemoteMethodByName('prototype.__get__devices');
+  // User.disableRemoteMethodByName('prototype.__destroyById__devices');
+  // User.disableRemoteMethodByName('prototype.__updateById__devices');
+
   /**
    * Gets user stats
    * @param {string} id user id
    * @param {Function(Error, object)} callback
    */
 
-  User.stats = function(id, cb) {
+  User.prototype.stats = function(cb) {
     var Comment = app.models.Comment;
     var Poll = app.models.Poll;
     var Vote = app.models.Vote;
     var stats;
 
-    var self = this;
+    var user = this;
     var commentCountPromise = Comment.count({
-      userId: id,
+      userId: user.id,
     });
 
     var pollCountPromise = Poll.count({
-      userId: id,
+      userId: user.id,
     });
 
     var voteCountPromise = Vote.count({
-      userId: id,
+      userId: user.id,
     });
 
     var topVoteCountPromise = Vote.count({
       and: [
-        {userId: id},
+        {userId: user.id},
         {isTopVote: true},
       ],
     });

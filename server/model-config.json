@@ -79,5 +79,9 @@
   "notification": {
     "dataSource": "mysqlDS",
     "public": false
+  },
+  "device": {
+    "dataSource": "mysqlDS",
+    "public": false
   }
 }

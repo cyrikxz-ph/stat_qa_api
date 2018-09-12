@@ -39,6 +39,11 @@
       "type": "hasOne",
       "model": "profile",
       "foreignKey": "userId"
+    },
+    "devices": {
+      "type": "hasMany",
+      "model": "device",
+      "foreignKey": ""
     }
   },
   "acls": [
@@ -46,13 +51,14 @@
       "principalType": "ROLE",
       "principalId": "$owner",
       "permission": "ALLOW",
-      "property": "__get__profile"
-    },
-    {
-      "principalType": "ROLE",
-      "principalId": "$owner",
-      "permission": "ALLOW",
-      "property": "__update__profile"
+      "property": [
+        "__get__profile",
+        "__update__profile",
+        "__create__devices",
+        "__findById__devices",
+        "__destroyById__devices",
+        "__updateById__devices"
+      ]
     },
     {
       "accessType": "EXECUTE",
@@ -63,18 +69,8 @@
     }
   ],
   "methods": {
-    "stats": {
-      "accepts": [
-        {
-          "arg": "id",
-          "type": "string",
-          "required": true,
-          "description": "user id",
-          "http": {
-            "source": "path"
-          }
-        }
-      ],
+    "prototype.stats": {
+      "accepts": [],
       "returns": [
         {
           "arg": "stats",
@@ -86,7 +82,7 @@
       "description": "Gets user stats",
       "http": [
         {
-          "path": "/:id/stats",
+          "path": "/stats",
           "verb": "get"
         }
       ]
