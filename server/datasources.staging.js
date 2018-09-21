@@ -1,6 +1,6 @@
 'use strict';
 
-var mysqlUrl = `mysqls://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOSTNAME}:${process.env.DB_PORT}/${process.env.DB_DBNAME_DEV}`;
+var mysqlUrl = `mysqls://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOSTNAME}:${process.env.DB_PORT}/${process.env.DB_DBNAME}`;
 
 module.exports = {
   mysqlDS: {
