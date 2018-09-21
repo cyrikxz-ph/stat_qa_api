@@ -14,9 +14,11 @@
     "test-watch": "nodemon --exec \"npm test\""
   },
   "dependencies": {
+    "apn": "^2.2.0",
     "cls-hooked": "^4.2.2",
     "compression": "^1.0.3",
     "cors": "^2.5.2",
+    "dotenv": "^6.0.0",
     "helmet": "^3.13.0",
     "https": "^1.0.0",
     "lodash": "^4.17.5",

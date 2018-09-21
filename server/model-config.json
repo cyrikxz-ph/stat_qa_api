@@ -64,10 +64,6 @@
     "dataSource": "mysqlDS",
     "public": false
   },
-  "Sns": {
-    "dataSource": "sns",
-    "public": false
-  },
   "specialization": {
     "dataSource": "mysqlDS",
     "public": true

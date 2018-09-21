@@ -114,7 +114,6 @@
       "principalId": "$owner",
       "permission": "ALLOW",
       "property": [
-        "prototype.close",
         "__updateById__comments",
         "__destroyById__comments"
       ]
@@ -131,14 +130,15 @@
     "expireOpenPolls": {
       "accepts": [],
       "returns": {
-        "arg": "pollIds",
-        "type": "[number]"
+        "arg": "polls",
+        "type": "[any]",
+        "root": true
       },
       "description": "Expire open polls that are beyond open time",
       "http": [
         {
           "path": "/expire",
-          "verb": "get",
+          "verb": "all",
           "status": 200
         }
       ]

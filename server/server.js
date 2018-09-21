@@ -1,5 +1,9 @@
 'use strict';
 
+require('dotenv').config();
+
+// console.log(process.env.APN_PRIVATE_KEY);
+
 var loopback = require('loopback');
 var boot = require('loopback-boot');
 // var sslConfig = require('./ssl-config');

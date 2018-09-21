@@ -3,6 +3,7 @@
 var utils = require('loopback/lib/utils');
 var _ = require('lodash');
 var app = require('../../server/server');
+var apn = require('apn');
 
 module.exports = function(User) {
 /*
@@ -207,6 +208,40 @@ module.exports = function(User) {
     }
   });
 
+  User.prototype.sendDeviceNotification = function(notificationType, data) {
+    var user = this;
+
+    return user.devices.find({where: {notificationEnabled: true}})
+      .then(function(userDevices) {
+        if (_.isEmpty(userDevices)) {
+          console.log('No User Devices', userDevices, user.id);
+          return Promise.resolve();
+        } else {
+          var userDvcTokens = _.map(userDevices, function(device) {
+            return device.deviceToken;
+          });
+
+          var apnProvider = new apn.Provider({
+            token: {
+              key: process.env.APN_KEY,
+              keyId: process.env.APN_KEY_ID,
+              teamId: process.env.APN_TEAM_ID,
+            },
+            production: process.env.APN_PROD_MODE,
+          });
+
+          var payload = createApnNotificationPayload(notificationType, data);
+          return apnProvider.send(payload, userDvcTokens);
+        }
+      })
+      .then(function(result) {
+        return Promise.resolve();
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
+  };
+
   User.beforeRemote('*.__updateById__devices', findByDeviceUUID);
   User.beforeRemote('*.__findById__devices', findByDeviceUUID);
   User.beforeRemote('*.__destroyById__devices', findByDeviceUUID);
@@ -222,5 +257,37 @@ module.exports = function(User) {
         }
         next();
       });
+  }
+
+  function createApnNotificationPayload(notificationType, data) {
+    var notification = new apn.Notification();
+    var notificationExpiry = Math.floor(Date.now() / 1000) + 3600;
+
+    notification.topic = process.env.APN_BUNDLE_ID;
+    notification.expiry = notificationExpiry;
+    notification.sound = 'ping.aiff';
+    notification['pollId'] = data.pollId.toString();
+
+    if (notificationType == 'NEW_COMMENT') {
+      notification.category = 'NEW_COMMENT';
+      notification.alert = {
+        title: 'New Comment',
+        subtitle: data.text,
+      };
+    } else if (notificationType == 'POLL_CLOSED') {
+      notification.category = 'POLL_CLOSED';
+      notification.alert = {
+        title: 'Poll Closed',
+        subtitle: data.text,
+      };
+    } else if (notificationType == 'NEW_POLL') {
+      notification.category = 'NEW_POLL';
+      notification.alert = {
+        title: 'New Poll',
+        subtitle: data.text,
+      };
+    }
+
+    return notification;
   }
 };

@@ -1,19 +1,9 @@
 {
-  "mysqlDS": {
-    "host": "127.0.0.1",
-    "port": 3306,
-    "url": "mysql://statqa_admin:password123@127.0.0.1:3306/stat_qa",
-    "database": "star_qa_dev",
-    "password": "password123",
-    "name": "mysqlDS",
-    "user": "starqa_admin",
-    "connector": "mysql"
-  },
   "sns": {
     "name": "sns",
     "connector": "loopback-connector-sns",
-    "accessKeyId": "AKIAJDAW43M2LRYCBVZQ",
-    "secretAccessKey": "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",
+    "accessKeyId": "XXXX",
+    "secretAccessKey": "XXXXX",
     "region": "us-west-1"
   }
 }

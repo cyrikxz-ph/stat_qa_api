@@ -19,9 +19,7 @@ module.exports = function(Device) {
           if (!_.isEmpty(oldDevice)) {
             return Device.deleteById(oldDevice.id);
           } else {
-            return new Promise(function(resolve) {
-              resolve('');
-            });
+            return Promise.resolve();
           }
         })
         .then(function() {
@@ -40,22 +38,4 @@ module.exports = function(Device) {
       }
     }
   });
-
-  // Device.observe('access', function(ctx, next) {
-  //   console.log(ctx);
-  //   next();
-  // //   var userId = ctx.query.where.userId;
-  // //   var id = ctx.query.where.id;
-  // //   ctx.query.where = {
-  // //     or: [{
-  // //       id: id,
-  // //       userId: userId,
-  // //     },
-  // //     {
-  // //       deviceUUID: id,
-  // //       userId: userId,
-  // //     }],
-  // //   };
-  // //   next();
-  // });
 };

@@ -67,6 +67,8 @@ module.exports = function(Vote) {
         .catch(function(err) {
           next(err);
         });
+    } else {
+      next();
     }
   });
 };

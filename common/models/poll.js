@@ -145,10 +145,7 @@ module.exports = function(Poll) {
   # Custom Functions #
   ####################
  */
-  Poll.expireOpenPolls = function(cb) {
-    console.log('Querying Open Polls...');
-    var Polls = app.models.Poll;
-
+  Poll.expireOpenPolls = function(next) {
     Poll.find({where: {isOpen: true}})
       .then(function(polls) {
         var expiredPolls = _.filter(polls, function(poll) {
@@ -156,26 +153,22 @@ module.exports = function(Poll) {
         });
         // console.log(expiredPolls);
         var exPollPromise = expiredPolls.map(function(poll) {
-          return poll.close()
-            .then(function(poll) {
-              console.log(poll.id);
-              return poll.id;
-            });
+          return poll.updateAttributes({'isOpen': false});
         });
 
         Promise.all(exPollPromise)
           .then(function(polls) {
-            console.log(polls);
-            cb(null, polls);
+            next(null, polls);
           })
-          .catch(function(e) {
-            cb(e);
+          .catch(function(err) {
+            next(err);
           });
       })
-      .catch(function(e) {
-        cb(e);
+      .catch(function(err) {
+        next(err);
       });
   };
+
   Poll.prototype.voteDetails = function(cb) {
     var pollOptions = this.options.find();
     var pollVotes = this.votes.find(
@@ -304,19 +297,6 @@ module.exports = function(Poll) {
     });
   };
 
-  Poll.prototype.close = function(cb) {
-    cb = cb || utils.createPromiseCallback();
-    this.updateAttribute('isOpen', false)
-      .then(function(poll) {
-        cb(null, poll);
-      })
-      .catch(function(e) {
-        cb(e);
-      });
-
-    return cb.promise;
-  };
-
   Poll.observe('before save', function(ctx, next) {
     // Validate Poll input structure on create
     if (ctx.isNewInstance) {
@@ -380,11 +360,6 @@ module.exports = function(Poll) {
 
     var poll = ctx.instance;
     if (ctx.isNewInstance) {
-      // # Create Notification Reference
-      Notification.create({
-        notificationType: 'COMMENT_NOTIFICATION',
-        referenceId: poll.id,
-      });
       // # Populate Options table
       var optionsPromise = [];
       optionsPromise = poll._options.map(function(option, index) {
@@ -430,6 +405,65 @@ module.exports = function(Poll) {
         });
       });
   };
+
+  Poll.afterRemote('create', function(ctx, results, next) {
+    var poll = results;
+    var User = app.models.User;
+
+    User.find({where: {specializationId: poll.specializationId}})
+      .then(function(users) {
+        return Promise.all(users.map(function(user) {
+          return user.sendDeviceNotification('NEW_POLL', {
+            text: poll.question,
+            pollId: poll.id,
+          });
+        }));
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
+
+    next();
+  });
+
+  Poll.afterRemote('expireOpenPolls', function(ctx, results, next) {
+    var closedPolls = results;
+
+    Promise.all(closedPolls.map(function(poll) {
+      return poll.user.get()
+        .then(function(user) {
+          return user.sendDeviceNotification('POLL_CLOSED', {
+            text: poll.question,
+            pollId: poll.id,
+          });
+        });
+    }))
+      .catch(function(err) {
+        console.error(err);
+      });
+    next();
+  });
+
+  Poll.afterRemote('prototype.__create__comments', function(ctx, results, next) {
+    var poll = ctx.instance;
+    var accessToken = ctx.args.options.accessToken;
+    var comment = ctx.result;
+
+    if (poll.userId != accessToken.userId) {
+      poll.user.get()
+      .then(function(user) {
+        return user.sendDeviceNotification('NEW_COMMENT', {
+          text: comment.comment,
+          pollId: poll.id,
+        });
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
+    }
+
+    next();
+  });
 
   Poll.afterRemote('*', function(ctx, results, next) {
     var appendPollProperties = function(poll) {

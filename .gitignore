@@ -19,6 +19,7 @@ coverage
 node_modules
 npm-debug.log
 *.sql
+server/private/*
 
 # Elastic Beanstalk Files
 .ebextensions
