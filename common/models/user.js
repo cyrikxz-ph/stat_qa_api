@@ -200,12 +200,27 @@ module.exports = function(User) {
         next();
       })
       .catch(function(e) {
-        console.error(e);
         next(e);
       });
     } else {
-      console.log(ctx.data);
       next();
     }
   });
+
+  User.beforeRemote('*.__updateById__devices', findByDeviceUUID);
+  User.beforeRemote('*.__findById__devices', findByDeviceUUID);
+  User.beforeRemote('*.__destroyById__devices', findByDeviceUUID);
+
+  function findByDeviceUUID(ctx, modelInstance, next) {
+    var Device = app.models.Device;
+    Device.findOne({where:
+      {or: [{deviceUUID: ctx.args.fk}, {id: ctx.args.fk}]},
+    })
+      .then(function(device) {
+        if (device) {
+          ctx.args.fk = device.id;
+        }
+        next();
+      });
+  }
 };

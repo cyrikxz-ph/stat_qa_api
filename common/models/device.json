@@ -9,8 +9,13 @@
     "userId"
   ],
   "properties": {
-    "appleDeviceId": {
-      "type": "string"
+    "deviceUUID": {
+      "type": "string",
+      "required": true
+    },
+    "deviceToken": {
+      "type": "string",
+      "required": true
     },
     "notificationEnabled": {
       "type": "boolean",
