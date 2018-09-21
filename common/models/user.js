@@ -214,7 +214,6 @@ module.exports = function(User) {
     return user.devices.find({where: {notificationEnabled: true}})
       .then(function(userDevices) {
         if (_.isEmpty(userDevices)) {
-          console.log('No User Devices', userDevices, user.id);
           return Promise.resolve();
         } else {
           var userDvcTokens = _.map(userDevices, function(device) {
@@ -223,7 +222,7 @@ module.exports = function(User) {
 
           var apnProvider = new apn.Provider({
             token: {
-              key: process.env.APN_KEY,
+              key: process.env.APN_KEY.replace(/\\n/g, '\n'),
               keyId: process.env.APN_KEY_ID,
               teamId: process.env.APN_TEAM_ID,
             },
