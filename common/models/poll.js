@@ -408,15 +408,20 @@ module.exports = function(Poll) {
 
   Poll.afterRemote('create', function(ctx, results, next) {
     var poll = results;
+    var accessToken = ctx.args.options.accessToken;
     var User = app.models.User;
 
     User.find({where: {specializationId: poll.specializationId}})
       .then(function(users) {
         return Promise.all(users.map(function(user) {
-          return user.sendDeviceNotification('NEW_POLL', {
-            text: poll.question,
-            pollId: poll.id,
-          });
+          if (user.id != accessToken.userId) {
+            return user.sendDeviceNotification('NEW_POLL', {
+              text: poll.question,
+              pollId: poll.id,
+            });
+          } else {
+            return Promise.resolve();
+          }
         }));
       })
       .catch(function(err) {
