@@ -216,9 +216,12 @@ module.exports = function(User) {
         if (_.isEmpty(userDevices)) {
           return Promise.resolve();
         } else {
+          console.info('Creating notification for userId:', user.id);
+
           var userDvcTokens = _.map(userDevices, function(device) {
             return device.deviceToken;
           });
+          console.info('Device Token count:', userDvcTokens.length);
 
           var apnProvider = new apn.Provider({
             token: {
@@ -229,7 +232,11 @@ module.exports = function(User) {
             production: process.env.APN_PROD_MODE,
           });
 
+          console.info('Creating payload');
           var payload = createApnNotificationPayload(notificationType, data);
+
+          console.info('Payload:', payload);
+          console.info('Sending notification to user device token:', userDvcTokens);
           return apnProvider.send(payload, userDvcTokens);
         }
       })
@@ -265,7 +272,9 @@ module.exports = function(User) {
     notification.topic = process.env.APN_BUNDLE_ID;
     notification.expiry = notificationExpiry;
     notification.sound = 'ping.aiff';
-    notification['pollId'] = data.pollId.toString();
+    notification.payload = {
+      pollId: data.pollId.toString(),
+    };
 
     if (notificationType == 'NEW_COMMENT') {
       notification.category = 'NEW_COMMENT';

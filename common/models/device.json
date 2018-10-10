@@ -5,8 +5,17 @@
   "options": {
     "validateUpsert": true
   },
+  "mixins": {
+    "TimeStamp": {
+      "required": false,
+      "validateUpsert": true,
+      "silenceWarnings": false
+    }
+  },
   "hidden": [
-    "userId"
+    "userId",
+    "createAt",
+    "updatedAt"
   ],
   "properties": {
     "deviceUUID": {
